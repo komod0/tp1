@@ -33,6 +33,7 @@ char* reader_readline(reader_t* reader) {
     } else {
       reader->start = reader->buffer;
     }
+    reader->end = reader->buffer + reader->bytes_read;
   }
   return d_buff_generate_str(reader->d_buff);
 }
