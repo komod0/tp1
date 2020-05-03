@@ -8,8 +8,9 @@
 
 typedef struct reader{
   FILE* input;
-  size_t start;
-  size_t eol_offset;
+  char* start;
+  char* end;
+  size_t bytes_read;
   d_buff_t* d_buff;
   char buffer[BUFF_SIZE]; // Sino hay que usar el heap
 } reader_t;
