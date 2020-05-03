@@ -10,12 +10,12 @@ typedef struct dynamic_buffer {
   size_t n_of_elements;
 } d_buff_t;
 
-bool buff_init(d_buff_t* buff, size_t size);
+bool d_buff_init(d_buff_t* buff, size_t size);
 
-bool buff_append(d_buff_t* dest, const char* src, size_t n);
+bool d_buff_append(d_buff_t* dest, const char* src, size_t n);
 
-bool buff_redim(d_buff_t* buff, size_t new_size);
+bool d_buff_redim(d_buff_t* buff, size_t new_size);
 
-void buff_empty(d_buff_t* buff);
+void d_buff_empty(d_buff_t* buff);
 
 #endif // DYN_BUFFER_H
