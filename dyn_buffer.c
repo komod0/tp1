@@ -35,3 +35,7 @@ void d_buff_empty(d_buff_t* buff) {
   memset(buff->arr, 0, buff->size);
   buff->n_of_elements = 0;
 }
+
+void d_buff_destroy(d_buff_t* buff) {
+  free(buff->arr);
+}

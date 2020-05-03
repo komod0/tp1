@@ -18,4 +18,6 @@ bool d_buff_redim(d_buff_t* buff, size_t new_size);
 
 void d_buff_empty(d_buff_t* buff);
 
+void d_buff_destroy(d_buff_t* buff);
+
 #endif // DYN_BUFFER_H
