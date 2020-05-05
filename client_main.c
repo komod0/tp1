@@ -17,7 +17,6 @@ int stdin_select(FILE** input, int argc, const char* argv[]) {
     printf("Cantidad de argumentos incorrecta\n");
     exit_code = 1;
   }
-
   return exit_code;
 }
 

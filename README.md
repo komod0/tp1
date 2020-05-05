@@ -47,4 +47,4 @@ Se adjunta un diagrama de secuencia para esquematizar como es que se procesa env
 ### Faltantes:
 
 
-Debido a un mal aprovechamiento del tiempo y una subestimación del tiempo requerido para realizar el trabajo no se pudo completar el mismo, se logro terminar la parte del cliente junto con los sockets y la interfaz del servidor, pero faltaron la parte de procesamiento y respuesta del server a los mensajes, asi mismo falto documentacion y corregir algunas perdidas de memoria en el lado del cliente.
+Debido a un mal aprovechamiento del tiempo y una subestimación del tiempo requerido para realizar el trabajo no se pudo completar el mismo, se logro terminar la parte del cliente junto con los sockets y la interfaz del servidor, pero faltaron la parte de procesamiento y respuesta del server a los mensajes, asi mismo falto documentación y corregir algunas perdidas de memoria en el lado del cliente.
