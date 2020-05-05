@@ -20,4 +20,6 @@ bool vector_resize(vector_t* vector, size_t new_size);
 
 size_t vector_length(vector_t* vector);
 
+void vector_destroy(vector_t* vector);
+
 #endif

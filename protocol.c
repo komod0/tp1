@@ -124,5 +124,7 @@ char* protocol_encode(char* msg, uint32_t msg_id) {
   if (vector_length(&arguments) > 4) { // Si hay body
     _protocol_add_body(&acum_msg, &arguments);
   }
+  vector_destroy(&arguments);
+  d_buff_destroy(&acum_msg);
   return d_buff_generate_str(&acum_msg);
 }

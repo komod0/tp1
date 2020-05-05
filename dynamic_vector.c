@@ -38,3 +38,7 @@ bool vector_resize(vector_t* vector, size_t new_size) {
   vector->size = new_size;
   return true;
 }
+
+void vector_destroy(vector_t* vector) {
+  free(vector->arr);
+}
