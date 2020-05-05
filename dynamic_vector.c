@@ -13,11 +13,11 @@ bool vector_init(vector_t* vector) {
 
 bool vector_append(vector_t* vector, void* element) {
   if (vector->n_elements + 1 > vector->size) {
-    if (!vector_resize(vector, vector->size * REDIM_FACTOR)) {
+    if (!vector_resize(vector, vector->size * REDIM_FACTOR * sizeof(void*))) {
       return false;
     }
   }
-  vector->arr[vector->size] = element;
+  vector->arr[vector->n_elements] = element;
   vector->n_elements++;
   return true;
 }

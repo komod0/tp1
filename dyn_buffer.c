@@ -1,5 +1,6 @@
 #include "dyn_buffer.h"
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -8,7 +9,6 @@
 bool d_buff_init(d_buff_t* buff, size_t size) {
   buff->arr = calloc(size, sizeof(char));
   if (buff->arr == NULL) return false;
-
   buff->n_of_elements = 0;
   buff->size = size;
   return true;
@@ -16,7 +16,7 @@ bool d_buff_init(d_buff_t* buff, size_t size) {
 
 bool d_buff_append(d_buff_t* dest, const char* src, size_t n) {
   if ((dest->n_of_elements + n) >= dest->size) {
-    if (!buff_redim(dest, dest->size * REDIM_FACTOR)) return false;
+    if (!d_buff_redim(dest, dest->size * REDIM_FACTOR)) return false;
   }
   memcpy(dest->arr + dest->n_of_elements, src, n);
   dest->n_of_elements += n;
@@ -44,6 +44,10 @@ char* d_buff_generate_str(d_buff_t* buff) {
 void d_buff_empty(d_buff_t* buff) {
   memset(buff->arr, 0, buff->size);
   buff->n_of_elements = 0;
+}
+
+size_t d_buff_get_len(d_buff_t* buff) {
+  return buff->n_of_elements;
 }
 
 void d_buff_destroy(d_buff_t* buff) { free(buff->arr); }

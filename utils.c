@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "utils.h"
 
@@ -12,14 +13,14 @@ void vectorize_msg(vector_t* vector, char* msg) {
 
   // Obtengo el metodo y los N parametros
   while( (token = strsep(&msg,"(),")) != NULL ) {
-    if(strlen(token > 0)) {  // Las cadenas vacias me arruinan la vida
+    if(strlen((char*)token)> 0) {  // Las cadenas vacias me arruinan la vida
       vector_append(vector, token);
     }
   }
 }
 
 uint32_t get_8_aligned_padding(size_t len) {
-  return 8 - len % 8;
+  return (8 - len % 8) % 8;
 }
 
 uint32_t get_8_aligned_size(char* s) {

@@ -7,12 +7,12 @@
 
 
 bool reader_init(reader_t* reader, FILE* input) {
-  reader->start = 0;
-  reader->end = BUFF_SIZE - 1;
+  memset(reader->buffer, 0, BUFF_SIZE);
+  reader->start = reader->buffer;
+  reader->end = reader->buffer + (BUFF_SIZE - 1);
   reader->bytes_read = 0;
   reader->input = input;
-  memset(reader->buffer, 0, BUFF_SIZE);
-  return d_buff_init(reader->d_buff, DYN_BUFFER_SIZE);
+  return d_buff_init(&reader->d_buff, DYN_BUFFER_SIZE);
 }
 
 char* reader_readline(reader_t* reader) {
@@ -27,7 +27,7 @@ char* reader_readline(reader_t* reader) {
     if (reader->end == NULL) {
       reader->end = reader->buffer + reader->bytes_read;
     }
-    d_buff_append(reader->d_buff,reader->start,reader->end - reader->start - 1);
+    d_buff_append(&reader->d_buff,reader->start,reader->end - reader->start);
     if (is_there_eol && (reader->end - reader->buffer) < BUFF_SIZE - 1) {
       reader->start = reader->end + 1; // Para saltearse el \n
     } else {
@@ -35,7 +35,7 @@ char* reader_readline(reader_t* reader) {
     }
     reader->end = reader->buffer + reader->bytes_read;
   }
-  return d_buff_generate_str(reader->d_buff);
+  return d_buff_generate_str(&reader->d_buff);
 }
 
 bool reader_is_at_eof(reader_t* reader) {

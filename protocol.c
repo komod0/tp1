@@ -2,14 +2,16 @@
 #include <byteswap.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "dynamic_vector.h"
 #include "protocol.h"
 #include "utils.h"
 
 #define NUM_OF_ARGS 4
-#define DBUFF_SIZE 32
+#define DBUFF_SIZE 64
 #define PARAM_DESCR_SIZE 8
+#define SIGNATURE_DESC_LEN 5
 
 #define DESTINY_TYPE 6
 #define PATH_TYPE 1
@@ -71,6 +73,15 @@ uint32_t _protocol_param_arr_length(vector_t* params) {
   for (int i = 0; i < NUM_OF_ARGS; i++) {
     length += PARAM_DESCR_SIZE + get_8_aligned_size(vector_get(params, i));
   }
+  bool there_is_signature = (vector_length(params) > 4);
+  if(there_is_signature) {
+    length += (SIGNATURE_DESC_LEN + vector_length(params) - NUM_OF_ARGS + 1);
+  } else {
+    length -= get_8_aligned_padding(
+      strlen((char*)vector_get(params, NUM_OF_ARGS - 1)));
+    
+  }
+  // No se cuenta el padding del ultimo elemento
   return length;
 }
 
@@ -114,7 +125,7 @@ void _protocol_encode_header(d_buff_t* tmp_msg, vector_t* args, uint32_t id) {
   _protocol_add_params(tmp_msg, args);
 }
 
-char* protocol_encode(char* msg, uint32_t msg_id) {
+char* protocol_encode(char* msg, uint32_t msg_id, size_t* len) {
   vector_t arguments;
   vector_init(&arguments);
   vectorize_msg(&arguments, msg);
@@ -125,6 +136,8 @@ char* protocol_encode(char* msg, uint32_t msg_id) {
     _protocol_add_body(&acum_msg, &arguments);
   }
   vector_destroy(&arguments);
+  *len = d_buff_get_len(&acum_msg);
+  char* formatted_str = d_buff_generate_str(&acum_msg);
   d_buff_destroy(&acum_msg);
-  return d_buff_generate_str(&acum_msg);
+  return formatted_str;
 }
