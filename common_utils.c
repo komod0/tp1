@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "utils.h"
+#include "common_utils.h"
 
 void vectorize_msg(vector_t* vector, char* msg) {
   char* token;
@@ -23,10 +23,13 @@ uint32_t get_8_aligned_padding(size_t len) {
   return (8 - len % 8) % 8;
 }
 
-uint32_t get_8_aligned_size(char* s) {
+uint32_t get_8_aligned_size(int i) {
+  i += get_8_aligned_padding(i);
+}
+
+uint32_t get_8_aligned_len(char* s) {
   uint32_t size = strlen(s) + 1;
-  size += get_8_aligned_padding(size);
-  return size;
+  return get_8_aligned_size(size);
 }
 
 char* concat_n_times(char* s, int n) {

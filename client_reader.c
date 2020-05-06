@@ -1,4 +1,4 @@
-#include "reader.h"
+#include "client_reader.h"
 #include <string.h>
 #include <stdbool.h>
 
@@ -40,4 +40,8 @@ char* reader_readline(reader_t* reader) {
 
 bool reader_is_at_eof(reader_t* reader) {
   return (feof(reader->input) != 0);
+}
+
+void reader_destroy(reader_t* reader) {
+  d_buff_destroy(&reader->d_buff);
 }

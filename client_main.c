@@ -26,6 +26,9 @@ int main(int argc, const char* argv[]) {
   client_t client;
   client_init(&client);
   client_connect(&client, argv[1], argv[2]);
-  client_prueba(&client, input);
+  client_run(&client, input);
+  if(argc == 4) {
+    fclose(input);
+  }
   return 0;
 }

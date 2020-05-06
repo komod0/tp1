@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include "dyn_buffer.h"
+#include "common_dyn_buffer.h"
 
 typedef struct socket { 
   int fd;

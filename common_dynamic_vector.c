@@ -1,4 +1,4 @@
-#include "dynamic_vector.h"
+#include "common_dynamic_vector.h"
 
 #define INITIAL_SIZE 32
 #define REDIM_FACTOR 2

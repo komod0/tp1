@@ -1,4 +1,4 @@
-#include "dyn_buffer.h"
+#include "common_dyn_buffer.h"
 
 #include <stdio.h>
 #include <stdbool.h>

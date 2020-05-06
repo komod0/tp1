@@ -4,14 +4,20 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "dynamic_vector.h"
-#include "protocol.h"
-#include "utils.h"
+#include "common_dynamic_vector.h"
+#include "common_protocol.h"
+#include "common_utils.h"
 
 #define NUM_OF_ARGS 4
 #define DBUFF_SIZE 64
 #define PARAM_DESCR_SIZE 8
 #define SIGNATURE_DESC_LEN 5
+#define ARR_LENGTH_OFFSET 12
+#define BODY_LENGTH_OFFSET 4
+#define ID_OFFSET 8
+#define PARAM_ARR_OFFSET 16
+#define PARAM_LEN_OFFSET 4
+#define PARAM_OFFSET 8
 
 #define DESTINY_TYPE 6
 #define PATH_TYPE 1
@@ -71,7 +77,7 @@ uint32_t _protocol_body_length(vector_t* arguments) {
 uint32_t _protocol_param_arr_length(vector_t* params) {
   uint32_t length = 0;
   for (int i = 0; i < NUM_OF_ARGS; i++) {
-    length += PARAM_DESCR_SIZE + get_8_aligned_size(vector_get(params, i));
+    length += PARAM_DESCR_SIZE + get_8_aligned_len(vector_get(params, i));
   }
   bool there_is_signature = (vector_length(params) > 4);
   if(there_is_signature) {
@@ -79,7 +85,6 @@ uint32_t _protocol_param_arr_length(vector_t* params) {
   } else {
     length -= get_8_aligned_padding(
       strlen((char*)vector_get(params, NUM_OF_ARGS - 1)));
-    
   }
   // No se cuenta el padding del ultimo elemento
   return length;
@@ -125,19 +130,94 @@ void _protocol_encode_header(d_buff_t* tmp_msg, vector_t* args, uint32_t id) {
   _protocol_add_params(tmp_msg, args);
 }
 
-char* protocol_encode(char* msg, uint32_t msg_id, size_t* len) {
+void _protocol_print_parameter_type(char c) {
+  switch (c)
+  {
+  case 1:
+    printf("* Ruta: ");
+    break;
+  case 2:
+    printf("* Interfaz: ");
+  case 3:
+    printf("* Metodo: ");
+  case 6:
+    printf("* Destino: ");
+  case 9:
+    printf("* Parametros:\n");
+  default:
+    break;
+  }
+}
+
+char* protocol_encode(protocol_t* protocol, 
+    char* msg, uint32_t msg_id, size_t* len) {
   vector_t arguments;
   vector_init(&arguments);
   vectorize_msg(&arguments, msg);
-  d_buff_t acum_msg;
-  d_buff_init(&acum_msg, DBUFF_SIZE);
-  _protocol_encode_header(&acum_msg, &arguments, msg_id);
+  _protocol_encode_header(&protocol->d_buff , &arguments, msg_id);
   if (vector_length(&arguments) > 4) { // Si hay body
-    _protocol_add_body(&acum_msg, &arguments);
+    _protocol_add_body(&protocol->d_buff, &arguments);
   }
   vector_destroy(&arguments);
-  *len = d_buff_get_len(&acum_msg);
-  char* formatted_str = d_buff_generate_str(&acum_msg);
-  d_buff_destroy(&acum_msg);
+  *len = d_buff_get_len(&protocol->d_buff);
+  char* formatted_str = d_buff_generate_str(&protocol->d_buff);
   return formatted_str;
 }
+
+void protocol_destroy(protocol_t* protocol) {
+    d_buff_destroy(&protocol->d_buff);
+}
+
+void protocol_init(protocol_t* protocol) {
+  d_buff_init(&protocol->d_buff, DBUFF_SIZE);
+}
+
+uint32_t _get_uint_at(const char* msg, size_t offset) {
+  uint32_t* aux = (uint32_t*)(msg + offset);
+  // de little a big y luego al host
+  return ntohl(bswap_32(*aux));
+}
+
+uint32_t protocol_decode_arr_len(const char* msg) {
+  return _get_uint_at(msg, ARR_LENGTH_OFFSET);
+}
+
+uint32_t protocol_decode_body_len(const char* msg) {
+  return _get_uint_at(msg, BODY_LENGTH_OFFSET);
+}
+
+uint32_t protocol_decode_id(const char* msg) {
+  return _get_uint_at(msg, ID_OFFSET);
+}
+
+uint32_t protocol_decode_param_len(const char* msg) {
+  return _get_uint_at(msg, PARAM_LEN_OFFSET);
+}
+
+void protocol_decode_and_print(protocol_t* protocol) {
+  size_t msg_len = d_buff_get_len(&protocol->d_buff);
+  char* msg = d_buff_generate_str(&protocol->d_buff);
+  uint32_t arr_len = protocol_decode_arr_len(msg);
+  uint32_t body_len =  protocol_decode_body_len(msg);
+  uint32_t param_len;
+  uint32_t id = protocol_decode_id(msg);
+  bool there_is_body = (body_len != 0);
+  printf("* Id: 0x%08x\n", id);
+  for(int i = PARAM_ARR_OFFSET; i < arr_len; ) {
+    char param_t = msg[i];
+    if(param_t == 9) break;
+    param_len = protocol_decode_param_len(msg + i);
+    printf("%s\n", msg + i + PARAM_OFFSET);
+    i += get_8_aligned_size(param_len + 1) + PARAM_DESCR_SIZE;
+  }
+  int body_offset = msg_len - body_len;
+  if(there_is_body) {
+    for(int j = body_offset; j < msg_len;) {
+      param_len = _get_uint_at(msg, body_offset);
+      printf("    * %s\n", msg + j + 4);
+    }
+  }
+}
+
+
+

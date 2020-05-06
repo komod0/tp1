@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
-#include "socket.h"
+#include "common_socket.h"
 
 #define LISTEN_QUEUE_SIZE 10
 
@@ -35,7 +36,7 @@ int socket_connect(socket_t* self, const char* host, const char* service) {
   }
   bool connected = false;
   int status = 0;
-  for(ptr=adr_l; !connected && adr_l; adr_l = adr_l->ai_next) {
+  for(ptr=adr_l; !connected && ptr; ptr = ptr->ai_next) {
     self->fd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (self->fd == -1) {
       fprintf(stderr, "self error: %s\n", strerror(errno));
@@ -62,7 +63,7 @@ int socket_bind(socket_t* self, const char* serv) {
   if(_socket_get_addr_list(self, &adr_l, NULL, serv, AI_PASSIVE) != SUCCESS) {
     return ERROR;
   }
-  for(ptr=adr_l; !binded && adr_l; adr_l = adr_l->ai_next) {
+  for(ptr=adr_l; !binded && ptr; ptr = ptr->ai_next) {
     self->fd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (self->fd == -1) {
       fprintf(stderr, "Socket error: %s\n", strerror(errno));
