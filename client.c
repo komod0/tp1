@@ -18,7 +18,7 @@ void client_init(client_t* client) {
   client->msg_id = 1;
 }
 
-int client_send(client_t* client, const void* buffer, size_t msg_len) {
+int client_send(client_t* client, const char* buffer, size_t msg_len) {
   int bytes_sent;
   bytes_sent = socket_send(&client->socket, buffer, msg_len);
   return (bytes_sent < 0 ? ERROR : SUCCESS);
@@ -38,25 +38,23 @@ int client_run(client_t* client, FILE* input) {
   reader_t reader;
   char *msg, *line, *line_aux;
   size_t msg_len;
-  // strsep modifica line,con line_aux libero el bloque facil despues
   if (!reader_init(&reader, input)) return ERROR;
 
   do {
     line = reader_readline(&reader);
     if (line == NULL) return 1;  // socket_accept(&server->socket, &server->peer)TODO
-    line_aux = line;
     msg = protocol_encode(&client->protocol, line, client->msg_id, &msg_len);
-    free(line_aux);
+    free(line);
     if (client_send(client, msg, msg_len) == ERROR) return ERROR;
     free(msg);
     client->msg_id++;
   } while (!reader_is_at_eof(&reader));
 
   reader_destroy(&reader);
-  socket_destroy(&client->socket);
-  return SUCCESS;
+  return client_disconnect(client);
 }
 
 int client_disconnect(client_t* client) {
+  protocol_destroy(&client->protocol);
   return socket_destroy(&client->socket);
 }

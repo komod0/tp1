@@ -18,11 +18,13 @@ void client_init(client_t* client);
 
 int client_connect(client_t* client, const char* host, const char* service);
 
-int client_send(client_t* client, const void* buffer, size_t msg_len);
+int client_send(client_t* client, const char* buffer, size_t msg_len);
 
 int client_recv(client_t* client, char* buffer, size_t len);
 
 int client_prueba(client_t* client, FILE* input);
+
+void client_destroy(client_t* client);
 
 int client_run(client_t* client, FILE* input);
 
