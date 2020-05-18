@@ -12,7 +12,7 @@ typedef struct reader {
   char* start;
   char* end;
   size_t bytes_read;
-  d_buff_t d_buff;
+  vector_t vector;
   char buffer[BUFF_SIZE];  // Sino hay que usar el heap
 } reader_t;
 

@@ -1,4 +1,7 @@
 #include "client_reader.h"
+#include "common_str_vector.h"
+#include "common_utils.h"
+
 #include <string.h>
 #include <stdbool.h>
 
@@ -12,11 +15,12 @@ bool reader_init(reader_t* reader, FILE* input) {
   reader->end = reader->buffer + (BUFF_SIZE - 1);
   reader->bytes_read = 0;
   reader->input = input;
-  return d_buff_init(&reader->d_buff, DYN_BUFFER_SIZE);
+  return str_vector_init(&reader->vector);
 }
 
 char* reader_readline(reader_t* reader) {
   bool is_there_eol = false;
+  char* result;
   while (!is_there_eol && !feof(reader->input)) {
     if (reader->start == reader->buffer) { // No me "quedo" nada en el buffer
       reader->bytes_read = fread(reader->buffer,1,BUFF_SIZE - 1, reader->input);
@@ -27,7 +31,8 @@ char* reader_readline(reader_t* reader) {
     if (reader->end == NULL) {
       reader->end = reader->buffer + reader->bytes_read;
     }
-    d_buff_append(&reader->d_buff,reader->start,reader->end - reader->start);
+    result = strndup(reader->start, reader->end - reader->start);
+    str_vector_append(&reader->vector, result, reader->end - reader->start);
     if (is_there_eol && (reader->end - reader->buffer) < BUFF_SIZE - 1) {
       reader->start = reader->end + 1; // Para saltearse el \n
     } else {
@@ -35,7 +40,7 @@ char* reader_readline(reader_t* reader) {
     }
     reader->end = reader->buffer + reader->bytes_read;
   }
-  return d_buff_generate_str(&reader->d_buff);
+  return str_vector_join(&reader->vector);
 }
 
 bool reader_is_at_eof(reader_t* reader) {
@@ -43,5 +48,6 @@ bool reader_is_at_eof(reader_t* reader) {
 }
 
 void reader_destroy(reader_t* reader) {
-  d_buff_destroy(&reader->d_buff);
+  free_vector_elems(&reader->vector);
+  str_vector_destroy(&reader->vector);
 }

@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 #include "common_dyn_buffer.h"
-#include "common_dynamic_vector.h"
+#include "common_str_vector.h"
 
 typedef struct protocol {
-  d_buff_t d_buff;
+  vector_t vector;
 }protocol_t;
 
 void protocol_init(protocol_t* protocol);

@@ -5,18 +5,47 @@
 #include "common_utils.h"
 
 void vectorize_msg(vector_t* vector, char* msg) {
-  char* token;
+  char* next;
+  int pos_act = 0;
+  char* act_chr = msg;
+  size_t str_length = strlen(msg);
   // Obtengo destino, path, interfaz
   for(int i = 0; i < 3; i++) {
-    vector_append(vector, strsep(&msg," "));
+    next = strpbrk(act_chr, " ");
+    str_vector_append(vector, strndup(act_chr, next-act_chr), next-act_chr);
+    pos_act += next - act_chr + 1; // +1 por el separador
+    act_chr = next + 1;
   }
 
   // Obtengo el metodo y los N parametros
-  while( (token = strsep(&msg,"(),")) != NULL ) {
-    if(strlen((char*)token)> 0) {  // Las cadenas vacias me arruinan la vida
-      vector_append(vector, token);
-    }
+  while (pos_act < str_length){
+    next = strpbrk(act_chr, "(,)");
+    printf("%.*s\n", (int)(next-act_chr), act_chr);
+    pos_act += next-act_chr + 1; // Por el separador el +1
+    act_chr = msg + pos_act;
+    str_vector_append(vector, strndup(act_chr, next-act_chr), next-act_chr);
   }
+}
+
+void free_vector_elems(vector_t* vector) {
+  for(int i = 0; i < str_vector_len(vector); i++) {
+    free(str_vector_get(vector, i));
+  }
+}
+
+size_t str_vec_total_size(vector_t* vector) {
+  size_t total_size = 0;
+  for(int i = 0; i < str_vector_len(vector); i++) {
+    total_size += str_vector_elem_len(vector, i);
+  }
+  return total_size;
+}
+
+char* strndup(const char* src, size_t n) {
+  char* result = malloc(n + 1);
+  strncpy(result, src, n);
+  result[n] = '\0';
+  return result;
 }
 
 uint32_t get_8_aligned_padding(size_t len) {
@@ -25,6 +54,7 @@ uint32_t get_8_aligned_padding(size_t len) {
 
 uint32_t get_8_aligned_size(int i) {
   i += get_8_aligned_padding(i);
+  return i;
 }
 
 uint32_t get_8_aligned_len(char* s) {
