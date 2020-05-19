@@ -60,17 +60,18 @@ void _protocol_add_parameter(
 
   if (type == SIGNATURE_TYPE) {
     _protocol_add_chr(tmp_msg, (int)strlen(param));
+    _protocol_add_str(tmp_msg,param,
+                get_8_aligned_padding(strlen(param) + 1 + SIGNATURE_DESC_LEN));
   } else {
     _protocol_add_int32(tmp_msg, strlen(param));
+    _protocol_add_str(tmp_msg, param, get_8_aligned_padding(strlen(param) + 1));
   }
-
-  _protocol_add_str(tmp_msg, param, get_8_aligned_padding(strlen(param) + 1));
 }
 
 uint32_t _protocol_body_length(vector_t* arguments) {
   uint32_t length = 0;
   for(int i = NUM_OF_ARGS; i < arguments->n_elements; i++) {
-    length += sizeof(uint32_t) + strlen((char*)str_vector_get(arguments, i)) + 1;
+    length += sizeof(uint32_t) + strlen(str_vector_get(arguments, i)) + 1;
   }
   return length;
 }
@@ -138,10 +139,13 @@ void _protocol_print_parameter_type(char c) {
     break;
   case 2:
     printf("* Interfaz: ");
+    break;
   case 3:
     printf("* Metodo: ");
+    break;
   case 6:
     printf("* Destino: ");
+    break;
   case 9:
     printf("* Parametros:\n");
   default:
@@ -162,11 +166,12 @@ char* protocol_encode(protocol_t* protocol,
   str_vector_destroy(&arguments);
   *len = str_vec_total_size(&protocol->vector);
   char* formatted_str = str_vector_join(&protocol->vector);
+  free_vector_elems(&protocol->vector);
+  str_vector_clear(&protocol->vector);
   return formatted_str;
 }
 
 void protocol_destroy(protocol_t* protocol) {
-    free_vector_elems(&protocol->vector);
     str_vector_destroy(&protocol->vector);
 }
 
@@ -197,8 +202,9 @@ uint32_t protocol_decode_param_len(const char* msg) {
 }
 
 void protocol_decode_and_print(protocol_t* protocol) {
-  size_t msg_len = d_buff_get_len(&protocol->d_buff);
-  char* msg = d_buff_generate_str(&protocol->d_buff);
+  size_t msg_len = str_vec_total_size(&protocol->vector);
+  char* msg = str_vector_join(&protocol->vector);
+
   uint32_t arr_len = protocol_decode_arr_len(msg);
   uint32_t body_len =  protocol_decode_body_len(msg);
   uint32_t param_len;
@@ -208,6 +214,7 @@ void protocol_decode_and_print(protocol_t* protocol) {
   for(int i = PARAM_ARR_OFFSET; i < arr_len; ) {
     char param_t = msg[i];
     if(param_t == 9) break;
+    _protocol_print_parameter_type(param_t);
     param_len = protocol_decode_param_len(msg + i);
     printf("%s\n", msg + i + PARAM_OFFSET);
     i += get_8_aligned_size(param_len + 1) + PARAM_DESCR_SIZE;
@@ -215,10 +222,15 @@ void protocol_decode_and_print(protocol_t* protocol) {
   int body_offset = msg_len - body_len;
   if(there_is_body) {
     for(int j = body_offset; j < msg_len;) {
-      param_len = _get_uint_at(msg, body_offset);
+      param_len = _get_uint_at(msg, j);
       printf("    * %s\n", msg + j + 4);
+      j += 4 + param_len + 1;
     }
   }
+  printf("\n");
+  free(msg);
+  free_vector_elems(&protocol->vector);
+  str_vector_clear(&protocol->vector);
 }
 
 
