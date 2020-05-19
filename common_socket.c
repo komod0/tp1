@@ -23,7 +23,7 @@ int _socket_get_addr_list(socket_t* self, struct addrinfo **addr_list,
 
   status = getaddrinfo(host, service, &hints, addr_list);
   if(status != 0) {
-    fprintf(stderr, "Error in gettaddrinfo", gai_strerror(status));
+    fprintf(stderr, "Error in gettaddrinfo: %s", gai_strerror(status));
     return ERROR;
   }
   return SUCCESS;
@@ -96,7 +96,7 @@ int socket_accept(socket_t* self, socket_t* peer) {
   return SUCCESS;
 }
 
-int socket_send(socket_t* self, const void* buffer, size_t length) {
+int socket_send(socket_t* self, const char* buffer, size_t length) {
   size_t bytes_sent = 0;
   int s;
   while(bytes_sent < length) {
@@ -113,7 +113,7 @@ int socket_send(socket_t* self, const void* buffer, size_t length) {
   return bytes_sent;
 }
 
-int socket_recv(socket_t* self, void* buffer, size_t length) {
+int socket_recv(socket_t* self, char* buffer, size_t length) {
   size_t bytes_recv = 0;
   int s;
   while(bytes_recv < length) {
@@ -131,5 +131,6 @@ int socket_recv(socket_t* self, void* buffer, size_t length) {
 }
 
 int socket_destroy(socket_t* socket) {
-  return shutdown(socket->fd, SHUT_RDWR) ||  close(socket->fd);
+  int status = shutdown(socket->fd, SHUT_RDWR);
+  return close(socket->fd) || status;
 }
