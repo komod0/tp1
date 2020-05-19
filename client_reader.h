@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#include "common_dyn_buffer.h"
+#include "common_str_vector.h"
 
 typedef struct reader {
   FILE* input;

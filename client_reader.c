@@ -40,7 +40,10 @@ char* reader_readline(reader_t* reader) {
     }
     reader->end = reader->buffer + reader->bytes_read;
   }
-  return str_vector_join(&reader->vector);
+  char* line = str_vector_join(&reader->vector);
+  free_vector_elems(&reader->vector);
+  str_vector_clear(&reader->vector);
+  return line;
 }
 
 bool reader_is_at_eof(reader_t* reader) {
@@ -48,6 +51,5 @@ bool reader_is_at_eof(reader_t* reader) {
 }
 
 void reader_destroy(reader_t* reader) {
-  free_vector_elems(&reader->vector);
   str_vector_destroy(&reader->vector);
 }
