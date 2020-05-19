@@ -214,7 +214,6 @@ void protocol_decode_and_print(protocol_t* protocol) {
   printf("* Id: 0x%08x\n", id);
   for ( int i = PARAM_ARR_OFFSET; i < arr_len + PARAM_ARR_OFFSET; ) {
     char param_t = msg[i];
-    printf("Param type: %d\n", param_t);
     _protocol_print_parameter_type(param_t);
     if ( param_t == 8 ) break;
     param_len = protocol_decode_param_len(msg + i);
