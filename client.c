@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "client.h"
-#include "common_dyn_buffer.h"
 #include "common_protocol.h"
 #include "client_reader.h"
 #include "common_socket.h"
@@ -36,22 +35,35 @@ int client_connect(client_t* client, const char* host, const char* service) {
 
 int client_run(client_t* client, FILE* input) {
   reader_t reader;
-  char *msg, *line, *line_aux;
+  char *msg, *line;
   size_t msg_len;
+  char recv_buff[RECV_BUFFER_SIZE];
   if (!reader_init(&reader, input)) return ERROR;
-
   do {
     line = reader_readline(&reader);
     if (line == NULL) return 1;  // socket_accept(&server->socket, &server->peer)TODO
     msg = protocol_encode(&client->protocol, line, client->msg_id, &msg_len);
     free(line);
+
     if (client_send(client, msg, msg_len) == ERROR) return ERROR;
     free(msg);
+    if(client_get_response(client, recv_buff, RECV_BUFFER_SIZE) == -1) {
+      return ERROR;
+    }
+    client_print_response(client, recv_buff);
     client->msg_id++;
   } while (!reader_is_at_eof(&reader));
 
   reader_destroy(&reader);
   return client_disconnect(client);
+}
+
+int client_get_response(client_t* client, char* buff, size_t buff_len) {
+  return socket_recv(&client->socket, buff, buff_len);
+}
+
+void client_print_response(client_t* client, char* buff) {
+  printf("0x%08X: %s", client->msg_id, buff);
 }
 
 int client_disconnect(client_t* client) {

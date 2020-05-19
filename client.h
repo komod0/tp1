@@ -24,7 +24,11 @@ int client_recv(client_t* client, char* buffer, size_t len);
 
 int client_prueba(client_t* client, FILE* input);
 
-void client_destroy(client_t* client);
+int client_get_response(client_t* client, char* buff, size_t buff_len);
+
+void client_print_response(client_t* client, char* buff);
+
+int client_disconnect(client_t* client);
 
 int client_run(client_t* client, FILE* input);
 
