@@ -21,6 +21,7 @@ void vectorize_msg(vector_t* vector, char* msg) {
   while (pos_act < str_length){
     next = strpbrk(act_chr, "(,)");
     pos_act += next-act_chr + 1; // Por el separador el +1
+    if (next-act_chr == 0) break;
     str_vector_append(vector, strndup(act_chr, next-act_chr), next-act_chr);
     act_chr = msg + pos_act;
   }

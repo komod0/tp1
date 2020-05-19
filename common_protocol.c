@@ -214,8 +214,13 @@ void protocol_decode_and_print(protocol_t* protocol) {
   printf("* Id: 0x%08x\n", id);
   for ( int i = PARAM_ARR_OFFSET; i < arr_len + PARAM_ARR_OFFSET; ) {
     char param_t = msg[i];
+    if ( param_t == 8 ) {
+      if (there_is_body) {
+        _protocol_print_parameter_type(param_t);
+      }
+      break;
+    }
     _protocol_print_parameter_type(param_t);
-    if ( param_t == 8 ) break;
     param_len = protocol_decode_param_len(msg + i);
     printf("%s\n", msg + i + PARAM_OFFSET);
     i += get_8_aligned_size(param_len + 1) + PARAM_DESCR_SIZE;
