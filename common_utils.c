@@ -20,10 +20,9 @@ void vectorize_msg(vector_t* vector, char* msg) {
   // Obtengo el metodo y los N parametros
   while (pos_act < str_length){
     next = strpbrk(act_chr, "(,)");
-    printf("%.*s\n", (int)(next-act_chr), act_chr);
     pos_act += next-act_chr + 1; // Por el separador el +1
-    act_chr = msg + pos_act;
     str_vector_append(vector, strndup(act_chr, next-act_chr), next-act_chr);
+    act_chr = msg + pos_act;
   }
 }
 
@@ -43,7 +42,7 @@ size_t str_vec_total_size(vector_t* vector) {
 
 char* strndup(const char* src, size_t n) {
   char* result = malloc(n + 1);
-  strncpy(result, src, n);
+  memcpy(result, src, n);
   result[n] = '\0';
   return result;
 }
