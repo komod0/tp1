@@ -2,6 +2,8 @@
 
 #include "client.h"
 
+enum EXIT_CODES{SUCCESS, ERROR};
+
 int stdin_select(FILE** input, int argc, const char* argv[]) {
   int exit_code = 0;
 
@@ -22,13 +24,17 @@ int stdin_select(FILE** input, int argc, const char* argv[]) {
 
 int main(int argc, const char* argv[]) {
   FILE* input;
-  if (stdin_select(&input, argc, argv) == 1) return 1;
+  int status;
+  if (stdin_select(&input, argc, argv) == ERROR) return ERROR;
   client_t client;
   client_init(&client);
-  client_connect(&client, argv[1], argv[2]);
-  client_run(&client, input);
+  status = client_connect(&client, argv[1], argv[2]);
+  if(status || client_run(&client, input)) {
+    if(argc == 4) {fclose(input);}
+    return ERROR;
+  }
   if(argc == 4) {
     fclose(input);
   }
-  return 0;
+  return SUCCESS;
 }
