@@ -6,6 +6,6 @@ int main(int argc, const char* argv[]) {
   server_t server;
   server_init(&server);
   server_bind_listen(&server, argv[1]);
-  server_accept(&server); // TODO: Set sockoptions
+  server_accept(&server);
   return server_run(&server);
 }

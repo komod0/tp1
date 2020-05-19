@@ -20,7 +20,7 @@ int server_bind_listen(server_t* server, const char* service);
 
 int server_send(server_t* server, const char* msg, size_t len);
 
-int server_recv_call(server_t* server, char* msg);
+int server_recv_call(server_t* server, char* msg, size_t buff_size);
 
 int server_run(server_t* server);
 
