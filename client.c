@@ -63,7 +63,7 @@ int client_get_response(client_t* client, char* buff, size_t buff_len) {
 }
 
 void client_print_response(client_t* client, char* buff) {
-  printf("0x%08X: %s", client->msg_id, buff);
+  printf("0x%08x: %s", client->msg_id, buff);
 }
 
 int client_disconnect(client_t* client) {

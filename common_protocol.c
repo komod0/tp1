@@ -147,7 +147,7 @@ void _protocol_print_parameter_type(char c) {
     printf("* Destino: ");
     break;
   case 9:
-    printf("* Parametros:\n");
+    break;
   default:
     break;
   }
