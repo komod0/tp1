@@ -28,4 +28,6 @@ char* str_vector_join(vector_t* vector);
 
 void str_vector_destroy(vector_t* vector);
 
+void str_vector_clear(vector_t* vector);
+
 #endif
