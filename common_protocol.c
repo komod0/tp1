@@ -210,8 +210,10 @@ void protocol_decode_and_print(protocol_t* protocol) {
   uint32_t body_len =  protocol_decode_body_len(msg);
   uint32_t param_len;
   uint32_t id = protocol_decode_id(msg);
+
   bool there_is_body = (body_len != 0);
   printf("* Id: 0x%08x\n", id);
+  
   for ( int i = PARAM_ARR_OFFSET; i < arr_len + PARAM_ARR_OFFSET; ) {
     char param_t = msg[i];
     if ( param_t == 8 ) {
