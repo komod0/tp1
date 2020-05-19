@@ -146,7 +146,8 @@ void _protocol_print_parameter_type(char c) {
   case 6:
     printf("* Destino: ");
     break;
-  case 9:
+  case 8:
+    printf("* Parametros:\n");
     break;
   default:
     break;
@@ -211,10 +212,11 @@ void protocol_decode_and_print(protocol_t* protocol) {
   uint32_t id = protocol_decode_id(msg);
   bool there_is_body = (body_len != 0);
   printf("* Id: 0x%08x\n", id);
-  for ( int i = PARAM_ARR_OFFSET; i < arr_len; ) {
+  for ( int i = PARAM_ARR_OFFSET; i < arr_len + PARAM_ARR_OFFSET; ) {
     char param_t = msg[i];
-    if ( param_t == 9 ) break;
+    printf("Param type: %d\n", param_t);
     _protocol_print_parameter_type(param_t);
+    if ( param_t == 8 ) break;
     param_len = protocol_decode_param_len(msg + i);
     printf("%s\n", msg + i + PARAM_OFFSET);
     i += get_8_aligned_size(param_len + 1) + PARAM_DESCR_SIZE;
