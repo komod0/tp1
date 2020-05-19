@@ -10,7 +10,7 @@ void vectorize_msg(vector_t* vector, char* msg) {
   char* act_chr = msg;
   size_t str_length = strlen(msg);
   // Obtengo destino, path, interfaz
-  for(int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     next = strpbrk(act_chr, " ");
     str_vector_append(vector, strndup(act_chr, next-act_chr), next-act_chr);
     pos_act += next - act_chr + 1; // +1 por el separador
@@ -27,14 +27,14 @@ void vectorize_msg(vector_t* vector, char* msg) {
 }
 
 void free_vector_elems(vector_t* vector) {
-  for(int i = 0; i < str_vector_len(vector); i++) {
+  for (int i = 0; i < str_vector_len(vector); i++) {
     free(str_vector_get(vector, i));
   }
 }
 
 size_t str_vec_total_size(vector_t* vector) {
   size_t total_size = 0;
-  for(int i = 0; i < str_vector_len(vector); i++) {
+  for (int i = 0; i < str_vector_len(vector); i++) {
     total_size += str_vector_elem_len(vector, i);
   }
   return total_size;
@@ -65,7 +65,7 @@ char* concat_n_times(char* s, int n) {
   int aux = 0;
   char* new_str = malloc(sizeof(char)*strlen(s)*n + 1);
   if (new_str == NULL) return NULL;
-  for(int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     memcpy(new_str + aux, s, strlen(s));
     aux += strlen(s);
   }

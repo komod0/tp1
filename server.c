@@ -21,14 +21,14 @@ void server_init(server_t* server) {
 }
 
 int server_bind_listen(server_t* server, const char* service) {
-  if(socket_bind(&server->socket, service) != SUCCESS) {
+  if (socket_bind(&server->socket, service) != SUCCESS) {
     return ERROR;
   }
   return socket_listen(&server->socket);
 }
 
 int server_send(server_t* server, const char* msg, size_t len) {
-  if(socket_send(&server->peer, msg, len) == -1) {
+  if (socket_send(&server->peer, msg, len) == -1) {
     return ERROR;
   }
   return SUCCESS;
@@ -37,9 +37,9 @@ int server_send(server_t* server, const char* msg, size_t len) {
 int server_recv_call(server_t* server, char* msg, size_t buff_size) {
   int bytes_read;
   bytes_read = socket_recv(&server->peer, msg, buff_size);
-  if(bytes_read == -1) {
+  if (bytes_read == -1) {
     return ERROR;
-  } else if(bytes_read == 0) return FINISHED;
+  } else if (bytes_read == 0) {return FINISHED;}
 
   str_vector_append(&server->protocol.vector, 
                     strndup(msg, buff_size), buff_size);
@@ -51,10 +51,10 @@ int server_recv_call(server_t* server, char* msg, size_t buff_size) {
   arr_len += body_len; // Tam total
   size_t to_read;
 
-  while(arr_len > 0) {
+  while (arr_len > 0) {
     to_read = (arr_len >= buff_size) ? buff_size : arr_len;
     arr_len -= to_read;
-    if(socket_recv(&server->peer, msg, to_read) == -1) {
+    if (socket_recv(&server->peer, msg, to_read) == -1) {
       return ERROR;
     }
     str_vector_append(&server->protocol.vector, strndup(msg, to_read), to_read);
@@ -69,13 +69,12 @@ int server_accept(server_t* server) {
 int server_run(server_t* server) {
   char buff[CHUNK_SIZE];
   int status = SUCCESS;
-  while(status == SUCCESS) {
+  while (status == SUCCESS) {
     status = server_recv_call(server, buff, CHUNK_SIZE);
-    if(status != SUCCESS) break;
+    if (status != SUCCESS) break;
     protocol_decode_and_print(&server->protocol);
     status = server_respond(server);
-    if(status != SUCCESS) break;
-
+    if (status != SUCCESS) break;
   }
   if (server_disconnect(server) != SUCCESS || status == ERROR) {
     return ERROR;

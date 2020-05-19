@@ -22,7 +22,7 @@ int _socket_get_addr_list(socket_t* self, struct addrinfo **addr_list,
   hints.ai_socktype = SOCK_STREAM;
 
   status = getaddrinfo(host, service, &hints, addr_list);
-  if(status != 0) {
+  if ( status != 0 ) {
     fprintf(stderr, "Error in gettaddrinfo: %s", gai_strerror(status));
     return ERROR;
   }
@@ -36,7 +36,7 @@ int socket_connect(socket_t* self, const char* host, const char* service) {
   }
   bool connected = false;
   int status = 0;
-  for(ptr=adr_l; !connected && ptr; ptr = ptr->ai_next) {
+  for ( ptr=adr_l; !connected && ptr; ptr = ptr->ai_next ) {
     self->fd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (self->fd == -1) {
       fprintf(stderr, "self error: %s\n", strerror(errno));
@@ -60,10 +60,10 @@ int socket_bind(socket_t* self, const char* serv) {
   struct addrinfo *adr_l, *ptr;
   int status;
   bool binded = false;
-  if(_socket_get_addr_list(self, &adr_l, NULL, serv, AI_PASSIVE) != SUCCESS) {
+  if (_socket_get_addr_list(self, &adr_l, NULL, serv, AI_PASSIVE) != SUCCESS) {
     return ERROR;
   }
-  for(ptr=adr_l; !binded && ptr; ptr = ptr->ai_next) {
+  for ( ptr=adr_l; !binded && ptr; ptr = ptr->ai_next ) {
     self->fd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (self->fd == -1) {
       fprintf(stderr, "Socket error: %s\n", strerror(errno));
@@ -80,7 +80,7 @@ int socket_bind(socket_t* self, const char* serv) {
 }
 
 int socket_listen(socket_t* self) {
-  if(listen(self->fd, LISTEN_QUEUE_SIZE) == -1) {
+  if ( listen(self->fd, LISTEN_QUEUE_SIZE) == -1 ) {
     fprintf(stderr, "Listen error: %s\n", strerror(errno));
     return ERROR;
   }
@@ -89,7 +89,7 @@ int socket_listen(socket_t* self) {
 
 int socket_accept(socket_t* self, socket_t* peer) {
   peer->fd = accept(self->fd, NULL, NULL);
-  if(peer->fd == -1) {
+  if ( peer->fd == -1 ) {
     fprintf(stderr, "Accept error: %s\n", strerror(errno));
     return ERROR;
   }
@@ -99,12 +99,12 @@ int socket_accept(socket_t* self, socket_t* peer) {
 int socket_send(socket_t* self, const char* buffer, size_t length) {
   size_t bytes_sent = 0;
   int s;
-  while(bytes_sent < length) {
+  while ( bytes_sent < length ) {
     s = send(self->fd, buffer + bytes_sent, length - bytes_sent, MSG_NOSIGNAL);
     if (s < 0) {
       fprintf(stderr, "Send error: %s\n", strerror(errno));
       return -1;
-    } else if(s == 0) {
+    } else if ( s == 0 ) {
       return 0;
     } else {
       bytes_sent += s;
@@ -116,12 +116,12 @@ int socket_send(socket_t* self, const char* buffer, size_t length) {
 int socket_recv(socket_t* self, char* buffer, size_t length) {
   size_t bytes_recv = 0;
   int s;
-  while(bytes_recv < length) {
+  while ( bytes_recv < length ) {
     s = recv(self->fd, buffer + bytes_recv, length - bytes_recv, 0);
     if (s < 0) {
       fprintf(stderr, "Recv error: %s\n", strerror(errno));
       return -1;
-    } else if(s == 0) {
+    } else if ( s == 0 ) {
       return 0;
     } else {
       bytes_recv += s;

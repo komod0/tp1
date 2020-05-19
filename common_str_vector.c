@@ -28,7 +28,7 @@ bool str_vector_append(vector_t* vector, char* str, size_t str_len) {
 }
 
 char* str_vector_get(vector_t* vector, size_t index) {
-  if(index >= vector->n_elements) {return NULL;}
+  if (index >= vector->n_elements) {return NULL;}
   return vector->arr[index]; 
 }
 
@@ -59,7 +59,7 @@ char* str_vector_join(vector_t* vector) {
   char* result = malloc(total_size);
   result[total_size-1] = '\0';
   int pos_act = 0;
-  for(int j = 0; j < vector->n_elements; j++) {
+  for (int j = 0; j < vector->n_elements; j++) {
     substr_len = str_vector_elem_len(vector, j);
     memcpy(result + pos_act, str_vector_get(vector, j), substr_len);
     pos_act += substr_len;

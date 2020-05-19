@@ -41,13 +41,13 @@ int client_run(client_t* client, FILE* input) {
   if (!reader_init(&reader, input)) return ERROR;
   do {
     line = reader_readline(&reader);
-    if (line == NULL) return 1;  // socket_accept(&server->socket, &server->peer)TODO
+    if (line == NULL) return 1;
     msg = protocol_encode(&client->protocol, line, client->msg_id, &msg_len);
     free(line);
 
     if (client_send(client, msg, msg_len) == ERROR) return ERROR;
     free(msg);
-    if(client_get_response(client, recv_buff, RECV_BUFFER_SIZE) == -1) {
+    if ( client_get_response(client, recv_buff, RECV_BUFFER_SIZE) == -1 ) {
       return ERROR;
     }
     client_print_response(client, recv_buff);

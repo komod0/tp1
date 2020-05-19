@@ -13,7 +13,7 @@ int stdin_select(FILE** input, int argc, const char* argv[]) {
       fprintf(stderr, "Error al abrir el archivo\n");
       exit_code = 1;
     }
-  } else if(argc == 3) {
+  } else if ( argc == 3 ) {
     *input = stdin;
   } else {
     printf("Cantidad de argumentos incorrecta\n");
@@ -29,11 +29,11 @@ int main(int argc, const char* argv[]) {
   client_t client;
   client_init(&client);
   status = client_connect(&client, argv[1], argv[2]);
-  if(status || client_run(&client, input)) {
-    if(argc == 4) {fclose(input);}
+  if ( status || client_run(&client, input) ) {
+    if ( argc == 4 ) {fclose(input);}
     return ERROR;
   }
-  if(argc == 4) {
+  if ( argc == 4 ) {
     fclose(input);
   }
   return SUCCESS;

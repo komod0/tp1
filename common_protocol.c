@@ -40,7 +40,7 @@ void _protocol_add_chr(vector_t* tmp_msg, char c) {
 void _protocol_add_str(vector_t* tmp_msg, char* s, size_t padding) {
   str_vector_append(tmp_msg, strndup(s, strlen(s)), strlen(s));
   _protocol_add_chr(tmp_msg, '\0');
-  for(int i = 0; i < padding; i++) {
+  for ( int i = 0; i < padding; i++ ) {
     _protocol_add_chr(tmp_msg, '\0');
   }
 }
@@ -70,7 +70,7 @@ void _protocol_add_parameter(
 
 uint32_t _protocol_body_length(vector_t* arguments) {
   uint32_t length = 0;
-  for(int i = NUM_OF_ARGS; i < arguments->n_elements; i++) {
+  for ( int i = NUM_OF_ARGS; i < arguments->n_elements; i++ ) {
     length += sizeof(uint32_t) + strlen(str_vector_get(arguments, i)) + 1;
   }
   return length;
@@ -82,7 +82,7 @@ uint32_t _protocol_param_arr_length(vector_t* params) {
     length += PARAM_DESCR_SIZE + get_8_aligned_len(str_vector_get(params, i));
   }
   bool there_is_signature = (str_vector_len(params) > 4);
-  if(there_is_signature) {
+  if ( there_is_signature ) {
     length += (SIGNATURE_DESC_LEN + str_vector_len(params) - NUM_OF_ARGS + 1);
   } else {
     length -= get_8_aligned_padding(
@@ -115,7 +115,7 @@ void _protocol_add_params(vector_t* tmp_msg, vector_t* args) {
 }
 
 void _protocol_add_body(vector_t* tmp_msg, vector_t* args) {
-  for(int i = NUM_OF_ARGS; i < str_vector_len(args); i++) {
+  for ( int i = NUM_OF_ARGS; i < str_vector_len(args); i++ ) {
     _protocol_add_int32(tmp_msg, strlen(str_vector_get(args, i)));
     _protocol_add_str(tmp_msg, str_vector_get(args, i), 0);
   }
@@ -211,17 +211,17 @@ void protocol_decode_and_print(protocol_t* protocol) {
   uint32_t id = protocol_decode_id(msg);
   bool there_is_body = (body_len != 0);
   printf("* Id: 0x%08x\n", id);
-  for(int i = PARAM_ARR_OFFSET; i < arr_len; ) {
+  for ( int i = PARAM_ARR_OFFSET; i < arr_len; ) {
     char param_t = msg[i];
-    if(param_t == 9) break;
+    if ( param_t == 9 ) break;
     _protocol_print_parameter_type(param_t);
     param_len = protocol_decode_param_len(msg + i);
     printf("%s\n", msg + i + PARAM_OFFSET);
     i += get_8_aligned_size(param_len + 1) + PARAM_DESCR_SIZE;
   }
   int body_offset = msg_len - body_len;
-  if(there_is_body) {
-    for(int j = body_offset; j < msg_len;) {
+  if ( there_is_body ) {
+    for ( int j = body_offset; j < msg_len; ) {
       param_len = _get_uint_at(msg, j);
       printf("    * %s\n", msg + j + 4);
       j += 4 + param_len + 1;
